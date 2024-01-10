@@ -7,6 +7,8 @@
 
 #define DEBUG 1
 
+#define MAX_FLOAT 3.4028235E+38
+
 #define I2C_ADDR 0x04
 #define MQ3_PIN 34
 #define FAN_PIN 18
@@ -15,16 +17,17 @@
 
 float c_NH3, c_CO, c_NO2, c_C3H8, c_C4H10, c_CH4, c_H2, c_C2H5OH, c_C2H6O;
 
-float thresholds[9];
+float thresholds[9] = {MAX_FLOAT, MAX_FLOAT, MAX_FLOAT, MAX_FLOAT, MAX_FLOAT,
+                       MAX_FLOAT, MAX_FLOAT, MAX_FLOAT, MAX_FLOAT};
 int index_gas;
 
 int fan_auto = 0;
 
 int tick = millis();
 
-const char* ssid = "RPi";
-const char* password = "raspberry";
-const char* mqtt_server = "10.42.0.1";
+const char* ssid = "iPhone de Louis";
+const char* password = "connexion11";
+const char* mqtt_server = "172.20.10.11";
 
 WiFiClient wifiClient;
 PubSubClient client(wifiClient);
