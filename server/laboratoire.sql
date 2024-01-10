@@ -1,0 +1,48 @@
+
+-- commandes de destruction des tables
+DROP TABLE IF EXISTS MesureGaz;
+DROP TABLE IF EXISTS MesureRFID;
+DROP TABLE IF EXISTS Capteur;
+DROP TABLE IF EXISTS Objet;
+DROP TABLE IF EXISTS TypeGaz;
+
+-- commandes de création des tables
+CREATE TABLE Capteur (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nom TEXT NOT NULL,
+    type TEXT NOT NULL,
+    dateInsertion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE TypeGaz (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nomTypeGaz TEXT NOT NULL,
+    idCapteurGaz INTEGER NOT NULL,
+    FOREIGN KEY (idCapteurGaz) REFERENCES CapteurGaz(idCapteurGaz)
+);
+
+CREATE TABLE MesureGaz (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    dateInsertion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    valeur INTEGER NOT NULL,
+    idCapteurGaz INTEGER NOT NULL,
+    idTypeGaz INTEGER NOT NULL,
+    FOREIGN KEY (idCapteurGaz) REFERENCES CapteurGaz(idCapteurGaz),
+    FOREIGN KEY (idTypeGaz) REFERENCES TypeGaz(idTypeGaz)
+);
+
+CREATE TABLE MesureRFID (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    idCapteurRFID INTEGER NOT NULL,
+    dateInsertion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    valeur TEXT NOT NULL,
+    FOREIGN KEY (idCapteurRFID) REFERENCES CapteurRFID(idCapteurRFID)
+);
+
+CREATE TABLE Objet (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_objet TEXT NOT NULL,
+    dateInsertion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    idCapteurRFID INTEGER NOT NULL,
+    FOREIGN KEY (idCapteurRFID) REFERENCES CapteurRFID(idCapteurRFID)
+);
