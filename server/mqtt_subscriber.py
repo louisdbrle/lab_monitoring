@@ -30,9 +30,17 @@ def on_message(client, userdata, msg):
     c = conn.cursor()
 
     if msg.topic.startswith("RFID"):
-        c.execute(
-            f"INSERT INTO MesureRFID(valeur, idCapteurRFID) VALUES ('{msg.payload.decode('utf-8')}', {msg.topic.split('/')[1]})"
-        )
+        c.execute(f"SELECT * FROM MesureRFID WHERE idCapteurRFID = {msg.topic[-1]}")
+        row = c.fetchone()
+
+        if row is None:
+            c.execute(
+                f"INSERT INTO MesureRFID(valeur, idCapteurRFID) VALUES ('{msg.payload.decode('utf-8')}', {int(msg.topic[-1])})"
+            )
+        else:
+            c.execute(
+                f"UPDATE MesureRFID SET valeur = '{msg.payload.decode('utf-8')}' WHERE idCapteurRFID = {int(msg.topic[-1])}"
+            )
     else:
         c.execute(
             f"INSERT INTO MesureGaz(valeur, idCapteurGaz, idTypeGaz) VALUES ({float(msg.payload.decode('utf-8'))}, {1 if topics.index(msg.topic) < 8 else 2}, {topics.index(msg.topic) + 1})"
