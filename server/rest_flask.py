@@ -97,9 +97,15 @@ def mesure_rfid(idCapteurRFID):
 
 @app.route("/FAN/<string:mode>", methods=["POST"])
 def set_fan(mode: str):
-    # Publish the mode to the FAN topic
+    # Publish the mode toju the FAN topic
     client.publish("FAN", mode)
-    return "OK"
+    return "Fan mode set to " + mode
+
+@app.route("/seuil/<int:threshold>", methods=["POST"])
+def set_seuil(threshold: int):
+    # Publish the treshold to the SEUIL topic
+    client.publish("THRESHOLDS", threshold)
+    return "Threshold set to " + str(threshold)
 
 
 # Add other routes for different endpoints
