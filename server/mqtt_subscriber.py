@@ -35,7 +35,7 @@ def on_message(client, userdata, msg):
         )
     else:
         c.execute(
-            f"INSERT INTO MesureGaz(valeur, idCapteurGaz, idTypeGaz) VALUES ({float(msg.payload.decode('utf-8'))}, {msg.topic}, {topics.index(msg.topic) + 1})"
+            f"INSERT INTO MesureGaz(valeur, idCapteurGaz, idTypeGaz) VALUES ({float(msg.payload.decode('utf-8'))}, {1 if topics.index(msg.topic) < 8 else 2}, {topics.index(msg.topic) + 1})"
         )
 
     conn.commit()
