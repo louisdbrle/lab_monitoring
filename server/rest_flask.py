@@ -107,7 +107,7 @@ def mesure_rfid(idCapteurRFID):
 
 @app.route("/graph_gaz", methods=["GET"])
 def graph():
-    conn = sqlite3.connect("db/laboratoire.db")
+    conn = sqlite3.connect("laboratoire.db")
     conn.row_factory = sqlite3.Row
     c = conn.cursor()
 
