@@ -1,11 +1,25 @@
 from flask import Flask, render_template, send_from_directory, jsonify, request, Response
 import sqlite3
+import json
+import paho.mqtt.client as mqtt
 
+# Create a client instance
+client = mqtt.Client()
 
+# Connect to the broker
+#client.connect("localhost", 1883, 60)  # replace "localhost" with your broker's IP
 
 app = Flask(__name__)
 
 gazIds = ["C2H6O", "NH3", "CO", "NO2", "C3H8", "C4H10", "CH4", "H2", "C2H5OH"]
+
+#table of correspondance between RFID IDS and objects names
+rfidIds = {"1D1EB7EC00": "Erlenmeyer", "1D1BB7EC00": "Ballon"}
+
+#Global variables for fanmode and threshold values
+fanMode = "AUTO"
+threshold_value = 2000
+threshold_gas = "C2H6O"
 
 @app.route('/image.gif')
 def image():
@@ -13,7 +27,7 @@ def image():
 
 @app.route('/')
 def index():
-    return render_template("index.html")
+    return render_template("index.html", fan_mode_value=fanMode)
 
 @app.route("/mesure/gaz/<string:gaz>", methods=["POST"])
 def mesure_gaz(gaz: str):
@@ -57,6 +71,44 @@ def mesure_gaz_all():
 
     return c.fetchall()
 
+#Route for threshold values where you set the threshold value and the gas
+@app.route("/THRESHOLD", methods=["GET", "POST"])
+def threshold():
+    global threshold_value
+    global threshold_gas
+    if request.method == "POST":
+        jsondata = request.get_data()
+        data = json.loads(jsondata)
+        threshold_value = data.get("threshold")
+        threshold_gas = data.get("gas")
+        print(threshold_value)
+        print(threshold_gas)
+
+    #publish to correspond to the esp32 format: "gasId threshold_value"
+    client.publish("THRESHOLD", f"{gazIds.index(threshold_gas)} {threshold_value}")
+    
+    if request.method == "GET":
+        #return a json object with 2 keys: gas and threshold for the value
+        return jsonify({"gas": threshold_gas, "threshold": threshold_value})
+    return "OK"
+
+#Route for fan mode where you set the fan mode, when get send the value of the fan mode
+@app.route("/FANMODE", methods=["GET", "POST"])
+def fanmode():
+    global fanMode
+    if request.method == "POST":
+        jsondata = request.get_data()
+        data = json.loads(jsondata)
+        fanMode = data.get("fanmode")
+        print(fanMode)
+        #Publish on mqtt  topic "FAN" "on" "off" or "auto" based on fanMode value
+        client.publish("FAN", fanMode.lower())
+        
+    if request.method == "GET":
+        return fanMode
+
+    return "OK"
+
 
 @app.route("/mesure/RFID/<int:idCapteurRFID>", methods=["POST", "GET"])
 def mesure_rfid(idCapteurRFID):
@@ -80,10 +132,11 @@ def mesure_rfid(idCapteurRFID):
             c.execute(
                 f"SELECT * FROM MesureRFID WHERE idCapteurRFID = {request.args['idCapteurRFID']}",
             )
+            object = rfidIds[c.fetchone()]
+            return object
         else:
-            c.execute("SELECT * FROM MesureRFID")
+            return "_____"
 
-        return c.fetchall()
 
     conn.commit()
     conn.close()

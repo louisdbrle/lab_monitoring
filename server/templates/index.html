@@ -53,6 +53,10 @@
             .navbar-nav  li a:hover {
               color: #1abc9c !important;
             }
+            /* Dropdown menu centered on the dropdown option */
+            .dropdown-menu {
+              text-align: center;
+            }
         </style>
     </head>
     <body>
@@ -73,7 +77,176 @@
             <h2>Timothé Buchert, Louis Dubarle, Adam Khazrane, Denn Marsso - EISE5</h2>
         </div>
 
-        <!-- Second Container -->
+        <!-- Third Container-->
+        <div class="container-fluid bg-4 text-center">
+          <div class="row">
+            <div class="col-md-6">
+              <!-- Second Container -->
+              <div class="container-fluid bg-4 text-center">
+                <h3>Fan Mode:</h3>
+                <div class="dropdown">
+                  <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Select an option
+                    <span class="caret"></span></button>
+                  <ul class="dropdown-menu">
+                    <li><a onclick="sendPostRequestFAN('ON')">ON</a></li>
+                    <li><a onclick="sendPostRequestFAN('AUTO')">AUTO</a></li>
+                    <li><a onclick="sendPostRequestFAN('OFF')">OFF</a></li>
+                  </ul>
+                </div>
+                <p id="fanModeValue">Current Fan Mode: </p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <!-- Fourth Container -->
+              <div class="container-fluid bg-4 text-center">
+                <h3 style="color: rgb(223, 223, 223);">Set Threshold:</h3>
+                <form id="thresholdForm">
+                  <select id="gasSelect" style="color: black;">
+                    <option value="C2H6O">C2H6O</option>
+                    <option value="NH3">NH3</option>
+                    <option value="CO">CO</option>
+                    <option value="NO2">NO2</option>
+                    <option value="C3H8">C3H8</option>
+                    <option value="C4H10">C4H10</option>
+                    <option value="CH4">CH4</option>
+                    <option value="H2">H2</option>
+                    <option value="C2H5OH">C2H5OH</option>
+                  </select>
+                  <input type="text" id="thresholdInput" placeholder="Enter a value" style="color: black;">
+                  <button type="submit" onclick="sendThreshold(event)" style="color: black;">Send</button>
+                </form>
+                <p id="threshold_gas">Current Threshold gas: </p>
+                <p id="threshold_value">Current Threshold value: </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fifth Container -->
+        <div class="container-fluid bg-3 text-center">
+          <div class="row">
+            <div class="col-md-6">
+              <!-- Sixth Container -->
+              <div class="container-fluid bg-3 text-center">
+                <h3>RFID 1:</h3>
+                <p id="RFID1">Current object at RFID 1: </p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <!-- Seventh Container -->
+              <div class="container-fluid bg-3 text-center">
+                <h3>RFID 2:</h3>
+                <p id="RFID2">Current object at RFID 2: </p>
+              </div>
+            </div>
+          </div>
+
+
+        <script>
+
+
+          function sendPostRequestFAN(value) {
+            const url = '/FANMODE';
+            fetch(url, {
+              method: 'POST',
+              body: JSON.stringify({ fanmode: value}),
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            })
+            .then(response => {
+              // Handle the response if needed
+            })
+            .catch(error => {
+              console.error('Error:', error);
+            });
+            updateFanModeValue();
+          }
+
+          function sendThreshold() {
+            event.preventDefault();
+            const gasValue = document.getElementById("gasSelect").value;
+            const thresholdValue = document.getElementById("thresholdInput").value;
+            const url = '/THRESHOLD';
+
+            fetch(url, {
+              method: 'POST',
+              body: JSON.stringify({ gas: gasValue, threshold: thresholdValue }),
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            })
+            .then(response => {
+              // Handle the response if needed
+            })
+            .catch(error => {
+              console.error('Error:', error);
+            });
+            updateThreshold();
+          }
+
+          function updateFanModeValue() {
+              const url = '/FANMODE';
+              fetch(url)
+                  .then(response => response.text())
+                  .then(data => {
+                      // Update the fan mode value on the HTML page
+                      document.getElementById("fanModeValue").textContent = "Current Fan Mode: " + data;
+                  })
+                  .catch(error => {
+                      console.error('Error:', error);
+                  });
+              
+          }
+          function updateThreshold(){
+            const url = '/THRESHOLD';
+            fetch(url)
+                .then(response => response.text())
+                .then(data => {
+                    // Update the fan mode value on the HTML page
+                    //get the gas and the threshold value from the json data : {"gas":"C2H6O","threshold":2000}
+                    var obj = JSON.parse(data);
+                    document.getElementById("threshold_gas").textContent = "Current Threshold gas: " + obj.gas;
+                    document.getElementById("threshold_value").textContent = "Current Threshold value: " + obj.threshold;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+          }
+
+          
+          function updateRFID1(){
+            const url = '/mesure/RFID/1';
+            fetch(url)
+                .then(response => response.text())
+                .then(data => {
+                  document.getElementById("RFID1").textContent = "Current object at RFID 1: " + data;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+          }
+
+          function updateRFID2(){
+            const url = '/mesure/RFID/2';
+            fetch(url)
+                .then(response => response.text())
+                .then(data => {
+                  document.getElementById("RFID2").textContent = "Current object at RFID 2: " + data;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+          }
+
+          // Fetch fan mode value initially and then update it every 5 seconds (adjust as needed)
+          updateFanModeValue();
+          updateThreshold();
+          setInterval(updateRFID1, 400);
+          setInterval(updateRFID2, 400);
+
+        </script>
+        
         
     </body>
 
