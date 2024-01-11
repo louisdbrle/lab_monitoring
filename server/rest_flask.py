@@ -1,7 +1,12 @@
 from flask import Flask, render_template, send_from_directory, jsonify, request, Response
 import sqlite3
+import paho.mqtt.client as mqtt
 
+# Create a client instance
+client = mqtt.Client()
 
+# Connect to the broker
+client.connect("localhost", 1883, 60)  # replace "localhost" with your broker's IP
 
 app = Flask(__name__)
 
@@ -89,6 +94,13 @@ def mesure_rfid(idCapteurRFID):
     conn.close()
 
     return "OK"
+
+@app.route("/FAN/<string:mode>", methods=["POST"])
+def set_fan(mode: str):
+    # Publish the mode to the FAN topic
+    client.publish("FAN", mode)
+    return "OK"
+
 
 # Add other routes for different endpoints
 
