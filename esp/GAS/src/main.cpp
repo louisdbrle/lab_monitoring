@@ -53,6 +53,7 @@ void setup() {
         Serial.println("Connecting to MQTT...");
         if (client.connect("ESP32Client_GAS")) {
             client.subscribe("FAN");
+            client.subscribe("THRESHOLD");
             Serial.println("Connected");
             break;
         } else {
@@ -78,7 +79,7 @@ void loop() {
         tick = millis();
         read_mgs();
         read_mq3();
-        gas_auto();
+        if (fan_auto) gas_auto();
     }
 }
 
@@ -141,7 +142,7 @@ void read_mq3() {
         Serial.println(ratio);
         Serial.print("Rs/R0 = ");
         Serial.println(RS_gas);
-        Serial.print("MQ3 = ");
+        Serial.print("C2H6O = ");
         Serial.println(c_C2H6O);
         Serial.println();
     }
@@ -245,7 +246,7 @@ void callback(char* topic, byte* message, unsigned int length) {
         } else if (messageTemp == "auto") {
             fan_auto = 1;
         }
-    } else if (String(topic) == "THRESHOLDS") {
+    } else if (String(topic) == "THRESHOLD") {
         sscanf(messageTemp.c_str(), "%d %f", &index_gas,
                thresholds + index_gas);
     }
