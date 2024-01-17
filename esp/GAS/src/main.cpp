@@ -15,7 +15,7 @@
 
 #define LOOP_DELAY_S 10
 
-float c_NH3, c_CO, c_NO2, c_C3H8, c_C4H10, c_CH4, c_H2, c_C2H5OH, c_C2H6O;
+float c_C2H6O, c_NH3, c_CO, c_NO2, c_C3H8, c_C4H10, c_CH4, c_H2, c_C2H5OH;
 
 float thresholds[9] = {MAX_FLOAT, MAX_FLOAT, MAX_FLOAT, MAX_FLOAT, MAX_FLOAT,
                        MAX_FLOAT, MAX_FLOAT, MAX_FLOAT, MAX_FLOAT};
@@ -79,8 +79,9 @@ void loop() {
         tick = millis();
         read_mgs();
         read_mq3();
-        if (fan_auto) gas_auto();
     }
+
+    if (fan_auto) gas_auto();
 }
 
 void read_mgs() {
@@ -153,7 +154,7 @@ void fan(int on) { digitalWrite(FAN_PIN, on); }
 void gas_auto() {
     switch (index_gas) {
         case 0:
-            if (c_NH3 > thresholds[0]) {
+            if (c_C2H6O > thresholds[0]) {
                 fan(1);
             } else {
                 fan(0);
@@ -161,7 +162,7 @@ void gas_auto() {
             break;
 
         case 1:
-            if (c_CO > thresholds[1]) {
+            if (c_NH3 > thresholds[1]) {
                 fan(1);
             } else {
                 fan(0);
@@ -169,7 +170,7 @@ void gas_auto() {
             break;
 
         case 2:
-            if (c_NO2 > thresholds[2]) {
+            if (c_CO > thresholds[2]) {
                 fan(1);
             } else {
                 fan(0);
@@ -177,7 +178,7 @@ void gas_auto() {
             break;
 
         case 3:
-            if (c_C3H8 > thresholds[3]) {
+            if (c_NO2 > thresholds[3]) {
                 fan(1);
             } else {
                 fan(0);
@@ -185,7 +186,7 @@ void gas_auto() {
             break;
 
         case 4:
-            if (c_C4H10 > thresholds[4]) {
+            if (c_C3H8 > thresholds[4]) {
                 fan(1);
             } else {
                 fan(0);
@@ -193,7 +194,7 @@ void gas_auto() {
             break;
 
         case 5:
-            if (c_CH4 > thresholds[5]) {
+            if (c_C4H10 > thresholds[5]) {
                 fan(1);
             } else {
                 fan(0);
@@ -201,7 +202,7 @@ void gas_auto() {
             break;
 
         case 6:
-            if (c_H2 > thresholds[6]) {
+            if (c_CH4 > thresholds[6]) {
                 fan(1);
             } else {
                 fan(0);
@@ -209,7 +210,7 @@ void gas_auto() {
             break;
 
         case 7:
-            if (c_C2H5OH > thresholds[7]) {
+            if (c_H2 > thresholds[7]) {
                 fan(1);
             } else {
                 fan(0);
@@ -217,7 +218,7 @@ void gas_auto() {
             break;
 
         case 8:
-            if (c_C2H6O > thresholds[8]) {
+            if (c_C2H5OH > thresholds[8]) {
                 fan(1);
             } else {
                 fan(0);
