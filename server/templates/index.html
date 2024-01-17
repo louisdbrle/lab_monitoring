@@ -11,6 +11,7 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <!-- Favicon -->
         <link rel="shortcut icon" href="/image.gif">
         <style>
@@ -38,8 +39,8 @@
               color: #fff;
             }
             .container-fluid {
-              padding-top: 70px;
-              padding-bottom: 70px;
+              padding-top: 30px;
+              padding-bottom: 30px;
             }
             .navbar {
               padding-top: 15px;
@@ -52,6 +53,31 @@
             }
             .navbar-nav  li a:hover {
               color: #1abc9c !important;
+            }
+            /* Dropdown menu centered on the dropdown option */
+            .dropdown-menu {
+              text-align: center;
+              left: 50%; /* Set the left position to 50% to center it */
+              transform: translateX(-50%); /* Adjust the position after setting left to 50% */
+            }
+
+            .dropdown {
+              align-items: center;
+            }
+
+            .RightWrong {
+              margin-top: -20px; /* Adjust the margin-top as needed to overlap the image above */
+            }
+
+            .image-container {
+              position: relative;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+            }
+
+            .container-fluid.bg-3.text-center img {
+              max-width: 100%; /* Adjust the max-width as needed */
             }
         </style>
     </head>
@@ -73,7 +99,457 @@
             <h2>Timothé Buchert, Louis Dubarle, Adam Khazrane, Denn Marsso - EISE5</h2>
         </div>
 
-        <!-- Second Container -->
+
+        <!-- Fifth Container -->
+        <div class="container-fluid bg-3 text-center">
+          <div class="row">
+            <div class="col-md-4">
+              <canvas id="chart1"></canvas>
+            </div>
+            <div class="col-md-4">  
+              <canvas id="chart2"></canvas>            
+            </div>
+            <div class="col-md-4">  
+              <canvas id="chart3"></canvas>            
+            </div>
+          </div>
+        </div>
+
+
+        <!-- Third Container-->
+        <div class="container-fluid bg-4 text-center">
+          <div class="row">
+            <div class="col-md-6">
+              <!-- Second Container -->
+              <div class="container-fluid bg-4 text-center">
+                <h3>Fan Mode:</h3>
+                <div class="dropdown">
+                  <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Select an option
+                    <span class="caret"></span></button>
+                  <ul class="dropdown-menu">
+                    <li><a onclick="sendPostRequestFAN('ON')">ON</a></li>
+                    <li><a onclick="sendPostRequestFAN('AUTO')">AUTO</a></li>
+                    <li><a onclick="sendPostRequestFAN('OFF')">OFF</a></li>
+                  </ul>
+                </div>
+                <p id="fanModeValue">Current Fan Mode: </p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <!-- Fourth Container -->
+              <div class="container-fluid bg-4 text-center">
+                <h3 style="color: rgb(223, 223, 223);">Set Threshold:</h3>
+                <form id="thresholdForm">
+                  <select id="gasSelect" style="color: black;">
+                    <option value="C2H6O">C2H6O</option>
+                    <option value="NH3">NH3</option>
+                    <option value="CO">CO</option>
+                    <option value="NO2">NO2</option>
+                    <option value="C3H8">C3H8</option>
+                    <option value="C4H10">C4H10</option>
+                    <option value="CH4">CH4</option>
+                    <option value="H2">H2</option>
+                    <option value="C2H5OH">C2H5OH</option>
+                  </select>
+                  <input type="text" id="thresholdInput" placeholder="Enter a value" style="color: black;">
+                  <button type="submit" onclick="sendThreshold(event)" style="color: black;">Send</button>
+                </form>
+                <p id="threshold_gas">Current Threshold gas: </p>
+                <p id="threshold_value">Current Threshold value: </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- Fifth Container -->
+        <div class="container-fluid bg-3 text-center">
+          <div class="row">
+            <div class="col-md-6">
+              <!-- Sixth Container -->
+              <div class="container-fluid bg-3 text-center">
+                <h3>RFID 1:</h3>
+                <div class="image-container">
+                  <img id="RFID1Image" src="" style="max-width: 30%;">
+                  <div class="RightWrong">
+                    <img id="RFID1Image_RW" src="" style="max-width: 30%;">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <!-- Seventh Container -->
+              <div class="container-fluid bg-3 text-center">
+                <h3>RFID 2:</h3>
+                <div class="image-container">
+                  <img id="RFID2Image" src="" style="max-width: 30%;">
+                  <div class="RightWrong">
+                    <img id="RFID2Image_RW" src="" style="max-width: 30%;">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Eigth Container -->
+        <div class="container-fluid bg-3 text-center">
+          <div class="row">
+            <div class="container-fluid bg-3 text-center">
+              <div class="container">
+                <form onsubmit="return addNewObject()">
+                  <div class="form-group">
+                    <label for="newObjectName">Nom de l'objet</label>
+                    <input type="text" class="form-control" id="newObjectName" placeholder="Nom de l'objet">
+                  </div>
+                  <div class="form-group">
+                    <label for="newObjectCount">Nombre</label>
+                    <input type="number" class="form-control" id="newObjectCount" placeholder="Nombre">
+                  </div>
+                  <button type="submit" class="btn btn-primary">Ajouter</button>
+                </form>
+              </div>
+              <div class="container">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Nom</th>
+                      <th>Nombre</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for object_name, object_count in stock.items() %}
+                    <tr>
+                      <td>{{ object_name }}</td>
+                      <td id="{{ object_name }}">{{ object_count }}</td>
+                      <td>
+                        <form onsubmit="return addOrUpdateObject('{{ object_name }}', event)">
+                          <button type="submit">Ajouter</button>
+                        </form>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <script>
+              const chart1 = document.getElementById('chart1');
+              const chart2 = document.getElementById('chart2');
+              const chart3 = document.getElementById('chart3');
+
+              const NO2 = {{ data.0.NO2 }};
+
+              const NH3 = {{ data.1.NH3 }};
+              const CO = {{ data.1.CO }};
+              const H2 = {{ data.1.H2 }};
+              const C2H5OH = {{ data.1.C2H5OH }};
+              const C2H6O = {{ data.1.C2H6O }};
+
+              const C3H8 = {{ data.2.C3H8 }};
+              const C4H10 = {{ data.2.C4H10 }};
+              const CH4 = {{ data.2.CH4 }};
+
+              const labels = [
+                ...Array(CH4.length).keys()
+              ];
+
+              new Chart(chart1, {
+                data: {
+                  labels: labels,
+                  datasets: [{
+                    type: 'line',
+                    label: 'NO2 (ppm)',
+                    data: NO2,
+                    borderWidth: 1
+                  }]
+                },
+                options: {
+                  scales: {
+                    y: {
+                      beginAtZero: true
+                    }
+                  }
+                }
+              });
+            
+              new Chart(chart2, {
+                data: {
+                  labels: labels,
+                  datasets: [{
+                    type: 'line',
+                    label: 'NH3 (ppm)',
+                    data: NH3,
+                    borderWidth: 1
+                  }, {
+                    type: 'line',
+                    label: 'CO (ppm)',
+                    data: CO,
+                    borderWidth: 1
+                  }, {
+                    type: 'line',
+                    label: 'H2 (ppm)',
+                    data: H2,
+                    borderWidth: 1
+                  }, {
+                    type: 'line',
+                    label: 'C2H5OH (ppm)',
+                    data: C2H5OH,
+                    borderWidth: 1
+                  }, {
+                    type: 'line',
+                    label: 'C2H6O (ppm)',
+                    data: C2H6O,
+                    borderWidth: 1
+                  }
+                ]
+                },
+                options: {
+                  scales: {
+                    y: {
+                      beginAtZero: true
+                    }
+                  }
+                }
+              });
+            
+              new Chart(chart3, {
+                data: {
+                  labels: labels,
+                  datasets: [{
+                    type: 'line',
+                    label: 'C3H8 (ppm)',
+                    data: C3H8,
+                    borderWidth: 1
+                  }, {
+                    type: 'line',
+                    label: 'C4H10 (ppm)',
+                    data: C4H10,
+                    borderWidth: 1
+                  }, {
+                    type: 'line',
+                    label: 'CH4 (ppm)',
+                    data: CH4,
+                    borderWidth: 1
+                  }
+                ]
+                },
+                options: {
+                  scales: {
+                    y: {
+                      beginAtZero: true
+                    }
+                  }
+                }
+              });
+
+          function sendPostRequestFAN(value) {
+            const url = '/FANMODE';
+            fetch(url, {
+              method: 'POST',
+              body: JSON.stringify({ fanmode: value}),
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            })
+            .then(response => {
+              // Handle the response if needed
+            })
+            .catch(error => {
+              console.error('Error:', error);
+            });
+            updateFanModeValue();
+          }
+
+          function sendThreshold() {
+            event.preventDefault();
+            const gasValue = document.getElementById("gasSelect").value;
+            const thresholdValue = document.getElementById("thresholdInput").value;
+            const url = '/THRESHOLD';
+
+            fetch(url, {
+              method: 'POST',
+              body: JSON.stringify({ gas: gasValue, threshold: thresholdValue }),
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            })
+            .then(response => {
+              // Handle the response if needed
+            })
+            .catch(error => {
+              console.error('Error:', error);
+            });
+            updateThreshold();
+          }
+
+          function updateFanModeValue() {
+              const url = '/FANMODE';
+              fetch(url)
+                  .then(response => response.text())
+                  .then(data => {
+                      // Update the fan mode value on the HTML page
+                      document.getElementById("fanModeValue").textContent = "Current Fan Mode: " + data;
+                  })
+                  .catch(error => {
+                      console.error('Error:', error);
+                  });
+              
+          }
+          function updateThreshold(){
+            const url = '/THRESHOLD';
+            fetch(url)
+                .then(response => response.text())
+                .then(data => {
+                    // Update the fan mode value on the HTML page
+                    //get the gas and the threshold value from the json data : {"gas":"C2H6O","threshold":2000}
+                    var obj = JSON.parse(data);
+                    document.getElementById("threshold_gas").textContent = "Current Threshold gas: " + obj.gas;
+                    document.getElementById("threshold_value").textContent = "Current Threshold value: " + obj.threshold;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+          }
+
+          
+          function updateRFID1() {
+            const url = '/mesure/RFID/1';
+            fetch(url)
+              .then(response => response.text())
+              .then(data => {
+                const imageElement = document.getElementById("RFID1Image");
+                if (data.trim() === "_____" || data.trim() === "") {
+                  // If RFID value is empty or "_____", set a default image or leave it blank
+                  imageElement.src = ""; // Set to a default image if needed
+                } else {
+                  // Otherwise, dynamically set the image source based on the RFID value
+                  imageElement.src = `/static/${data.trim().toLowerCase()}.png`;
+                }
+              })
+              .catch(error => {
+                console.error('Error:', error);
+              });
+          }
+
+          function updateRFID2() {
+            const url = '/mesure/RFID/2';
+            fetch(url)
+              .then(response => response.text())
+              .then(data => {
+                const imageElement = document.getElementById("RFID2Image");
+                if (data.trim() === "_____" || data.trim() === "") {
+                  // If RFID value is empty or "_____", set a default image or leave it blank
+                  imageElement.src = ""; // Set to a default image if needed
+                } else {
+                  // Otherwise, dynamically set the image source based on the RFID value
+                  imageElement.src = `/static/${data.trim().toLowerCase()}.png`;
+                }
+              })
+              .catch(error => {
+                console.error('Error:', error);
+              });
+          }
+
+          function updateRFID1_RW() {
+            const url = '/mesure/RFID_RW/1';
+            fetch(url)
+              .then(response => response.text())
+              .then(data => {
+                const imageElement = document.getElementById("RFID1Image_RW");
+                if (data.trim() === "_____" || data.trim() === "") {
+                  // If RFID value is empty or "_____", set a default image or leave it blank
+                  imageElement.src = ""; // Set to a default image if needed
+                } else {
+                  // Otherwise, dynamically set the image source based on the RFID value
+                  imageElement.src = `/static/${data.trim().toLowerCase()}.png`;
+                }
+              })
+              .catch(error => {
+                console.error('Error:', error);
+              });
+          }
+
+          function updateRFID2_RW() {
+            const url = '/mesure/RFID_RW/2';
+            fetch(url)
+              .then(response => response.text())
+              .then(data => {
+                const imageElement = document.getElementById("RFID2Image_RW");
+                if (data.trim() === "_____" || data.trim() === "") {
+                  // If RFID value is empty or "_____", set a default image or leave it blank
+                  imageElement.src = ""; // Set to a default image if needed
+                } else {
+                  // Otherwise, dynamically set the image source based on the RFID value
+                  imageElement.src = `/static/${data.trim().toLowerCase()}.png`;
+                }
+              })
+              .catch(error => {
+                console.error('Error:', error);
+              });
+          }
+          function addOrUpdateObject(objectName, event) {
+            event.preventDefault();
+
+            const url = '/add_or_update_object';
+
+            fetch(url, {
+              method: 'POST',
+              body: JSON.stringify({ object_name: objectName }),
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            })
+            .then(response => response.text())
+            .then(data => {
+              document.getElementById(objectName).textContent = data;
+            })
+            .catch(error => {
+              console.error('Error:', error);
+            });
+            
+            return false;
+          }
+
+          function addNewObject() {
+            const objectName = document.getElementById("newObjectName").value;
+            const objectCount = document.getElementById("newObjectCount").value;
+            const url = '/add_new_object';
+
+            fetch(url, {
+              method: 'POST',
+              body: JSON.stringify({ object_name: objectName, object_count: objectCount }),
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            })
+            .then(response => response.json())  
+            .then(data => {
+              const table = document.querySelector('table tbody');
+              const newRow = table.insertRow(table.rows.length - 1);
+              newRow.innerHTML = `<td>${data.object_name}</td><td id="${data.object_name}">${data.object_count}</td><td><form onsubmit="return addOrUpdateObject('${data.object_name}', event)"><button type="submit">Ajouter</button></form></td>`;
+            })
+            .catch(error => {
+              console.error('Error:', error);
+            });
+            return false;
+          }
+        
+          // Fetch fan mode value initially and then update it every 5 seconds
+          updateFanModeValue();
+          updateThreshold();
+          setInterval(updateRFID1, 1500);
+          setInterval(updateRFID2, 1500);
+          setInterval(updateRFID1_RW, 1500);
+          setInterval(updateRFID2_RW, 1500);
+
+        </script>
+        
         
     </body>
 
