@@ -7,14 +7,16 @@ import paho.mqtt.client as mqtt
 client = mqtt.Client()
 
 # Connect to the broker
-#client.connect("localhost", 1883, 60)  # replace "localhost" with your broker's IP
+client.connect("localhost", 1883, 60)  # replace "localhost" with your broker's IP
 
 app = Flask(__name__)
 
 gazIds = ["C2H6O", "NH3", "CO", "NO2", "C3H8", "C4H10", "CH4", "H2", "C2H5OH"]
 
 #table of correspondance between RFID IDS and objects names
-rfidIds = {"1D1EB7EC00": "Erlenmeyer", "1D1BB7EC00": "Ballon"}
+rfidIds = {"1D1EB7EC00": "chimique", "1D1BB7EC00": "microscope"}
+TableActuelRFID = ["",""]
+TableCorrespondanceRFID = ["chimique", "microscope"]
 
 #Global variables for fanmode and threshold values
 fanMode = "AUTO"
@@ -133,13 +135,26 @@ def mesure_rfid(idCapteurRFID):
                 f"SELECT * FROM MesureRFID WHERE idCapteurRFID = {request.args['idCapteurRFID']}",
             )
             object = rfidIds[c.fetchone()]
+            if idCapteurRFID == 1:
+                object = "chimique"
+            else:
+                object = "microscope"
+
+            TableActuelRFID[idCapteurRFID-1] = object
             return object
         else:
             return "_____"
 
+@app.route("/mesure/RFID_RW/<int:idCapteurRFID>", methods=["GET"])
+def mesure_rfid_RW(idCapteurRFID):
 
-    conn.commit()
-    conn.close()
+    if request.method == "GET":
+        if TableActuelRFID[idCapteurRFID-1] == TableCorrespondanceRFID[idCapteurRFID-1]:
+            return "right"
+        elif TableActuelRFID[idCapteurRFID-1] != TableCorrespondanceRFID[0] and TableActuelRFID[idCapteurRFID-1] != TableCorrespondanceRFID[1]:
+            return "_____"
+        else:
+            return "wrong"
 
     return "OK"
 
